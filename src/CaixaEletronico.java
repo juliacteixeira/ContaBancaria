@@ -43,7 +43,7 @@ public class CaixaEletronico {
                     System.out.println("Opção inválida. Tente novamente.");
                     break;
             }
-        } while (opcao != 5);
+        } while (opcao != 6);
     }
 
     private void transferir() {
