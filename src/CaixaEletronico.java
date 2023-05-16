@@ -1,13 +1,12 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class CaixaEletronico {
     private Scanner scanner;
-    private Conta[] contas;
-    private int qtdContas;
+    private ArrayList<Conta> contas;
 
     public CaixaEletronico() {
-        contas = new Conta[2];
-        qtdContas = 0;
+        contas = new ArrayList<>();
         scanner = new Scanner(System.in);
     }
 
@@ -37,13 +36,53 @@ public class CaixaEletronico {
                     transferir();
                     break;
                 case 6:
+                    getContas();
+                    break;
+                case 7:
+                    pesquisarContas();
+                    break;
+                case 8:
+                    removerConta();
+                    break;
+                case 9:
                     System.out.println("Encerrando programa...");
                     break;
                 default:
                     System.out.println("Opção inválida. Tente novamente.");
                     break;
             }
-        } while (opcao != 6);
+        } while (opcao != 9);
+    }
+
+    private void pesquisarContas() {
+        System.out.println("Pesquisar contas");
+        System.out.println("==============================");
+        System.out.println("Digite o nome ou parte do nome do cliente: ");
+        String nome = scanner.nextLine();
+        for (Conta conta : contas) {
+            if (conta.getCliente().getNome().contains(nome)) {
+                System.out.println("=====================");
+                System.out
+                        .println(conta.getNumeroConta() + " - "
+                                + conta.getCliente().getNome());
+                System.out.println("=====================");
+                break;
+            } else {
+                System.out.println("conta não encontrada");
+                break;
+            }
+        }
+    }
+
+    private void getContas() {
+        System.out.println("Contas cadastradas:");
+        System.out.println("=====================");
+        for (Conta conta : contas) {
+            System.out
+                    .println("Número da conta: " + conta.getNumeroConta() + "\nNome do cliente: "
+                            + conta.getCliente().getNome());
+            System.out.println("=====================");
+        }
     }
 
     private void transferir() {
@@ -82,6 +121,34 @@ public class CaixaEletronico {
             }
         }
         return null;
+    }
+
+    public boolean removerConta() {
+        System.out.println("Remover conta");
+        System.out.println("==============================");
+        System.out.println("Informe o número da conta que deseja remover:");
+        int numConta = Integer.parseInt(scanner.nextLine());
+        Conta conta = buscarConta(numConta);
+        if (conta.getSaldo() > 0) {
+            System.out.println("A conta não pode ser removida pois ainda existe saldo remanescente.");
+            return false;
+        }
+
+        if (conta.getLimite() < 0) {
+            System.out.println("A conta não pode ser removida pois o limite esta sendo usado.");
+            return false;
+        }
+
+        for (int i = 0; i < contas.size(); i++) {
+            if (contas.get(i).getNumeroConta() == numConta) {
+                contas.remove(i);
+                System.out.println("Conta removida com sucesso!");
+                return true;
+            } else {
+                System.out.println("Conta não econtrada!");
+            }
+        }
+        return false;
     }
 
     private int getNumConta() {
@@ -168,19 +235,18 @@ public class CaixaEletronico {
         System.out.println("Digite o valor do limite da conta: ");
         Double limite = Double.parseDouble(scanner.nextLine());
 
-        if (qtdContas == contas.length) {
-            System.out.println("Limite de contas atingido");
+        if (saldo > 0) {
+            Conta conta = new Conta(saldo, limite, cliente);
+            contas.add(conta);
         } else {
-            if (saldo > 0) {
-                contas[qtdContas] = new Conta(saldo, limite, cliente);
-                qtdContas++;
-            } else {
-                contas[qtdContas] = new Conta(limite, cliente);
-                qtdContas++;
-            }
+            Conta conta = new Conta(limite, cliente);
+            contas.add(conta);
+
         }
 
-        System.out.println("Conta criada com sucesso! Número da conta: " + contas[qtdContas - 1].getNumeroConta());
+        int lastIdx = contas.size() - 1;
+
+        System.out.println("Conta criada com sucesso! Número da conta: " + contas.get(lastIdx).getNumeroConta());
 
     }
 
@@ -191,6 +257,9 @@ public class CaixaEletronico {
         System.out.println("3 - Depositar");
         System.out.println("4 - Sacar");
         System.out.println("5 - Transferir");
-        System.out.println("6 - Sair");
+        System.out.println("6 - Listar contas criadas");
+        System.out.println("7 - Buscar conta");
+        System.out.println("8 - Remover conta");
+        System.out.println("9 - Sair");
     }
 }
